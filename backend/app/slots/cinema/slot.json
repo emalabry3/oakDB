@@ -1,0 +1,9 @@
+{
+  "id": "cinema-v1",
+  "name": "Le Cinéma",
+  "description": "Explorez les films, acteurs et séances d'un complexe cinématographique.",
+  "difficulty": "avance",
+  "version": "1.0",
+  "author": "oakDB",
+  "tags": ["sous-requêtes", "jointures multiples", "agrégations avancées"]
+}

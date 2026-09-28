@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Surlignage des clauses SQL dans Monaco Editor */
+.sql-clause-highlight {
+  background-color: rgba(250, 204, 21, 0.35);
+  border-radius: 2px;
+}

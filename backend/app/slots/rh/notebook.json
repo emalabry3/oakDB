@@ -1,0 +1,189 @@
+{
+  "title": "Apprendre SQL avec les Ressources Humaines",
+  "description": "Gérez les employés, services et salaires d'une entreprise.",
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "Employés et filtres",
+      "description": "Sélections et filtres sur la table des employés.",
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Interroger les employés",
+          "exercises": [
+            {
+              "id": "rh-01",
+              "title": "Employés par salaire",
+              "statement": "Affiche le prénom, le nom, et le salaire de tous les employés, triés par salaire décroissant.",
+              "hints": [
+                "Interrogez la table employes.",
+                "Utilisez ORDER BY sur la colonne salaire.",
+                "ORDER BY salaire DESC pour un tri décroissant."
+              ],
+              "answer_query": "SELECT prenom, nom, salaire FROM employes ORDER BY salaire DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "rh-02",
+              "title": "Informaticiens",
+              "statement": "Affiche le prénom, le nom et la date d'embauche des employés travaillant dans le service Informatique.",
+              "hints": [
+                "Vous devez joindre employes et services pour connaître le nom du service.",
+                "Le lien entre les tables est la colonne service_id.",
+                "Filtrez avec WHERE s.nom = 'Informatique'."
+              ],
+              "answer_query": "SELECT e.prenom, e.nom, e.date_embauche FROM employes e JOIN services s ON e.service_id = s.id WHERE s.nom = 'Informatique'",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-03",
+              "title": "Hauts salaires",
+              "statement": "Affiche le prénom, le nom et le salaire des employés dont le salaire est supérieur à 4000 euros.",
+              "hints": [
+                "Filtrez directement dans la table employes.",
+                "Utilisez WHERE avec une comparaison numérique.",
+                "WHERE salaire > 4000"
+              ],
+              "answer_query": "SELECT prenom, nom, salaire FROM employes WHERE salaire > 4000",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-04",
+              "title": "Récentes embauches",
+              "statement": "Affiche le prénom, le nom et la date d'embauche des employés embauchés après le 1er janvier 2020, triés par date d'embauche.",
+              "hints": [
+                "Comparez date_embauche avec une chaîne de date au format 'YYYY-MM-DD'.",
+                "Utilisez WHERE date_embauche > '2020-01-01'.",
+                "Ajoutez ORDER BY date_embauche pour le tri."
+              ],
+              "answer_query": "SELECT prenom, nom, date_embauche FROM employes WHERE date_embauche > '2020-01-01' ORDER BY date_embauche",
+              "order_sensitive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "Jointures",
+      "description": "Relier les tables employes, services, postes entre elles.",
+      "lessons": [
+        {
+          "id": "l2",
+          "title": "Relier les tables RH",
+          "exercises": [
+            {
+              "id": "rh-05",
+              "title": "Employés et leurs services",
+              "statement": "Affiche le prénom, le nom de chaque employé ainsi que le nom de son service.",
+              "hints": [
+                "Joignez les tables employes et services.",
+                "La colonne service_id dans employes fait le lien.",
+                "SELECT e.prenom, e.nom, s.nom AS service FROM employes e JOIN services s ON e.service_id = s.id"
+              ],
+              "answer_query": "SELECT e.prenom, e.nom, s.nom AS service FROM employes e JOIN services s ON e.service_id = s.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-06",
+              "title": "Employés et leurs postes",
+              "statement": "Affiche le prénom, le nom de chaque employé ainsi que le titre de son poste.",
+              "hints": [
+                "Joignez les tables employes et postes.",
+                "La colonne poste_id dans employes fait le lien.",
+                "SELECT e.prenom, e.nom, p.titre FROM employes e JOIN postes p ON e.poste_id = p.id"
+              ],
+              "answer_query": "SELECT e.prenom, e.nom, p.titre FROM employes e JOIN postes p ON e.poste_id = p.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-07",
+              "title": "Vue complète des employés",
+              "statement": "Affiche le prénom, le nom, le nom du service et le titre du poste pour chaque employé, trié par nom de service.",
+              "hints": [
+                "Vous avez besoin de trois tables : employes, services et postes.",
+                "Faites deux JOIN successifs depuis la table employes.",
+                "Triez avec ORDER BY s.nom à la fin."
+              ],
+              "answer_query": "SELECT e.prenom, e.nom, s.nom AS service, p.titre AS poste FROM employes e JOIN services s ON e.service_id = s.id JOIN postes p ON e.poste_id = p.id ORDER BY s.nom",
+              "order_sensitive": true
+            },
+            {
+              "id": "rh-08",
+              "title": "Employés et leurs managers",
+              "statement": "Affiche le prénom, le nom de chaque employé ainsi que le prénom et le nom de son manager (ignorer les employés sans manager).",
+              "hints": [
+                "Vous devez faire une auto-jointure sur la table employes.",
+                "La colonne manager_id référence l'id d'un autre employé.",
+                "JOIN employes m ON e.manager_id = m.id — les employés sans manager seront exclus automatiquement."
+              ],
+              "answer_query": "SELECT e.prenom, e.nom, m.prenom AS manager_prenom, m.nom AS manager_nom FROM employes e JOIN employes m ON e.manager_id = m.id",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "Agrégations",
+      "description": "Compter les employés, calculer des moyennes de salaire et filtrer des groupes.",
+      "lessons": [
+        {
+          "id": "l3",
+          "title": "Statistiques RH",
+          "exercises": [
+            {
+              "id": "rh-09",
+              "title": "Effectifs par service",
+              "statement": "Affiche le nom de chaque service et le nombre d'employés qu'il contient, trié par nombre d'employés décroissant.",
+              "hints": [
+                "Joignez employes et services, puis regroupez par service.",
+                "Utilisez COUNT(e.id) pour compter les employés.",
+                "Triez avec ORDER BY nb_employes DESC."
+              ],
+              "answer_query": "SELECT s.nom, COUNT(e.id) AS nb_employes FROM services s JOIN employes e ON e.service_id = s.id GROUP BY s.nom ORDER BY nb_employes DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "rh-10",
+              "title": "Salaire moyen par service",
+              "statement": "Affiche le nom de chaque service et le salaire moyen de ses employés, arrondi à 2 décimales.",
+              "hints": [
+                "Joignez employes et services, puis regroupez par service.",
+                "Utilisez AVG(e.salaire) pour calculer la moyenne.",
+                "Enveloppez avec ROUND(..., 2) pour arrondir."
+              ],
+              "answer_query": "SELECT s.nom, ROUND(AVG(e.salaire), 2) AS salaire_moyen FROM services s JOIN employes e ON e.service_id = s.id GROUP BY s.nom",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-11",
+              "title": "Services bien rémunérés",
+              "statement": "Affiche le nom des services dont le salaire moyen est supérieur à 4000 euros.",
+              "hints": [
+                "Commencez par calculer le salaire moyen par service avec GROUP BY.",
+                "HAVING permet de filtrer sur le résultat d'une agrégation.",
+                "HAVING AVG(e.salaire) > 4000"
+              ],
+              "answer_query": "SELECT s.nom FROM services s JOIN employes e ON e.service_id = s.id GROUP BY s.nom HAVING AVG(e.salaire) > 4000",
+              "order_sensitive": false
+            },
+            {
+              "id": "rh-12",
+              "title": "Au-dessus de la moyenne",
+              "statement": "Affiche le prénom, le nom et le salaire des employés dont le salaire est supérieur au salaire moyen de l'entreprise.",
+              "hints": [
+                "Vous avez besoin du salaire moyen global de l'entreprise.",
+                "Calculez ce moyen avec une sous-requête : (SELECT AVG(salaire) FROM employes).",
+                "WHERE e.salaire > (SELECT AVG(salaire) FROM employes)"
+              ],
+              "answer_query": "SELECT prenom, nom, salaire FROM employes WHERE salaire > (SELECT AVG(salaire) FROM employes)",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

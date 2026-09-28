@@ -1,0 +1,9 @@
+{
+  "id": "mediatheque-v1",
+  "name": "La Médiathèque",
+  "description": "Gérez les livres, auteurs et emprunts d'une médiathèque municipale.",
+  "difficulty": "intermediaire",
+  "version": "1.0",
+  "author": "oakDB",
+  "tags": ["jointures", "agrégations", "dates", "NULL"]
+}

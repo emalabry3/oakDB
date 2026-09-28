@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - oakdb_data:/app/backend/app/oakdb_data
+    environment:
+      - FORMATEUR_DEFAULT_PASSWORD=${FORMATEUR_DEFAULT_PASSWORD:-admin}
+      - CORS_ORIGINS=*
+    labels:
+      - "caddy=${DOMAIN:-localhost}"
+      - "caddy.reverse_proxy={{upstreams 8000}}"
+
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - caddy_data:/data
+    environment:
+      - CADDY_INGRESS_NETWORKS=oakdb_default
+
+volumes:
+  oakdb_data:
+  caddy_data:

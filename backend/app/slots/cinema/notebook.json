@@ -1,0 +1,238 @@
+{
+  "title": "Apprendre SQL avec le Cinéma",
+  "description": "Explorez les films, acteurs et séances d'un complexe cinématographique.",
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "Découverte",
+      "description": "Premières requêtes sur la base cinématographique.",
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Explorer les films",
+          "exercises": [
+            {
+              "id": "cin-01",
+              "title": "Classement des films",
+              "statement": "Affiche le titre, l'année de sortie et la note moyenne de tous les films, triés par note décroissante.",
+              "hints": [
+                "Interrogez la table films.",
+                "Utilisez ORDER BY sur note_moyenne.",
+                "ORDER BY note_moyenne DESC pour un tri du meilleur au moins bon."
+              ],
+              "answer_query": "SELECT titre, annee_sortie, note_moyenne FROM films ORDER BY note_moyenne DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "cin-02",
+              "title": "Films longs",
+              "statement": "Affiche le titre et la durée (en minutes) des films de plus de 120 minutes.",
+              "hints": [
+                "Filtrez la table films avec une condition numérique.",
+                "La colonne duree_minutes contient la durée de chaque film.",
+                "WHERE duree_minutes > 120"
+              ],
+              "answer_query": "SELECT titre, duree_minutes FROM films WHERE duree_minutes > 120",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-03",
+              "title": "Films de la décennie 2010",
+              "statement": "Affiche le titre et l'année de sortie des films sortis entre 2010 et 2020 inclus.",
+              "hints": [
+                "Filtrez la table films sur l'année de sortie.",
+                "BETWEEN permet de tester une plage de valeurs incluse.",
+                "WHERE annee_sortie BETWEEN 2010 AND 2020"
+              ],
+              "answer_query": "SELECT titre, annee_sortie FROM films WHERE annee_sortie BETWEEN 2010 AND 2020",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "Jointures",
+      "description": "Relier films, réalisateurs, acteurs, genres et séances.",
+      "lessons": [
+        {
+          "id": "l2",
+          "title": "Relier les tables",
+          "exercises": [
+            {
+              "id": "cin-04",
+              "title": "Films et réalisateurs",
+              "statement": "Affiche le titre de chaque film avec le prénom et le nom de son réalisateur.",
+              "hints": [
+                "Joignez les tables films et realisateurs.",
+                "La colonne realisateur_id dans films fait le lien.",
+                "SELECT f.titre, r.prenom, r.nom FROM films f JOIN realisateurs r ON f.realisateur_id = r.id"
+              ],
+              "answer_query": "SELECT f.titre, r.prenom, r.nom FROM films f JOIN realisateurs r ON f.realisateur_id = r.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-05",
+              "title": "Films et genres",
+              "statement": "Affiche le titre de chaque film et le nom de son genre.",
+              "hints": [
+                "Joignez les tables films et genres.",
+                "La colonne genre_id dans films fait le lien.",
+                "SELECT f.titre, g.nom AS genre FROM films f JOIN genres g ON f.genre_id = g.id"
+              ],
+              "answer_query": "SELECT f.titre, g.nom AS genre FROM films f JOIN genres g ON f.genre_id = g.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-06",
+              "title": "Acteurs des films d'action",
+              "statement": "Affiche le titre du film, le prénom et le nom de l'acteur et le nom de son personnage pour les films du genre 'Action'.",
+              "hints": [
+                "Quatre tables sont nécessaires : films, roles, acteurs et genres.",
+                "Joignez films avec roles (film_id), roles avec acteurs (acteur_id), films avec genres (genre_id).",
+                "Filtrez avec WHERE g.nom = 'Action' à la fin."
+              ],
+              "answer_query": "SELECT f.titre, a.prenom, a.nom, r.nom_personnage FROM films f JOIN roles r ON f.id = r.film_id JOIN acteurs a ON r.acteur_id = a.id JOIN genres g ON f.genre_id = g.id WHERE g.nom = 'Action'",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-07",
+              "title": "Séances disponibles",
+              "statement": "Affiche le titre du film, la salle, la date/heure et le prix des séances disponibles (places_disponibles > 0), triées par date.",
+              "hints": [
+                "Joignez seances et films.",
+                "Filtrez sur places_disponibles > 0.",
+                "Triez avec ORDER BY s.date_heure."
+              ],
+              "answer_query": "SELECT f.titre, s.salle, s.date_heure, s.prix FROM seances s JOIN films f ON s.film_id = f.id WHERE s.places_disponibles > 0 ORDER BY s.date_heure",
+              "order_sensitive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "Agrégations",
+      "description": "Calculer des statistiques sur les films, réalisateurs et acteurs.",
+      "lessons": [
+        {
+          "id": "l3",
+          "title": "Statistiques cinéma",
+          "exercises": [
+            {
+              "id": "cin-08",
+              "title": "Note moyenne par genre",
+              "statement": "Affiche le nom de chaque genre et la note moyenne des films de ce genre, arrondie à 1 décimale, trié par note décroissante.",
+              "hints": [
+                "Joignez genres et films, puis regroupez par nom de genre.",
+                "Utilisez AVG(f.note_moyenne) et ROUND(..., 1).",
+                "Triez avec ORDER BY note_genre DESC."
+              ],
+              "answer_query": "SELECT g.nom, ROUND(AVG(f.note_moyenne), 1) AS note_genre FROM genres g JOIN films f ON f.genre_id = g.id GROUP BY g.nom ORDER BY note_genre DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "cin-09",
+              "title": "Réalisateurs prolifiques",
+              "statement": "Affiche le prénom, le nom de chaque réalisateur et le nombre de films qu'il a réalisés, pour les réalisateurs ayant fait au moins 2 films.",
+              "hints": [
+                "Joignez realisateurs et films, puis regroupez par réalisateur.",
+                "Comptez avec COUNT(f.id).",
+                "HAVING COUNT(f.id) >= 2 pour filtrer."
+              ],
+              "answer_query": "SELECT r.prenom, r.nom, COUNT(f.id) AS nb_films FROM realisateurs r JOIN films f ON f.realisateur_id = r.id GROUP BY r.prenom, r.nom HAVING COUNT(f.id) >= 2",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-10",
+              "title": "Acteurs très présents",
+              "statement": "Affiche le prénom et le nom des acteurs ayant joué dans au moins 3 films.",
+              "hints": [
+                "Joignez acteurs et roles, puis regroupez par acteur.",
+                "Comptez le nombre de rôles avec COUNT(r.film_id).",
+                "HAVING COUNT(r.film_id) >= 3"
+              ],
+              "answer_query": "SELECT a.prenom, a.nom, COUNT(r.film_id) AS nb_films FROM acteurs a JOIN roles r ON r.acteur_id = a.id GROUP BY a.prenom, a.nom HAVING COUNT(r.film_id) >= 3",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-11",
+              "title": "Films les plus programmés",
+              "statement": "Affiche le titre des films avec le nombre de séances programmées, trié par nombre de séances décroissant.",
+              "hints": [
+                "Joignez films et seances, puis regroupez par titre.",
+                "Comptez les séances avec COUNT(s.id).",
+                "Triez avec ORDER BY nb_seances DESC."
+              ],
+              "answer_query": "SELECT f.titre, COUNT(s.id) AS nb_seances FROM films f JOIN seances s ON s.film_id = f.id GROUP BY f.titre ORDER BY nb_seances DESC",
+              "order_sensitive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch4",
+      "title": "Sous-requêtes",
+      "description": "Maîtriser les sous-requêtes pour des analyses avancées.",
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "Requêtes imbriquées",
+          "exercises": [
+            {
+              "id": "cin-12",
+              "title": "Films au-dessus de la moyenne",
+              "statement": "Affiche le titre et la note des films dont la note est supérieure à la note moyenne de tous les films.",
+              "hints": [
+                "Calculez la note moyenne globale avec une sous-requête.",
+                "(SELECT AVG(note_moyenne) FROM films) vous donne la moyenne.",
+                "WHERE f.note_moyenne > (SELECT AVG(note_moyenne) FROM films)"
+              ],
+              "answer_query": "SELECT titre, note_moyenne FROM films WHERE note_moyenne > (SELECT AVG(note_moyenne) FROM films)",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-13",
+              "title": "Acteurs des chefs-d'œuvre",
+              "statement": "Affiche le prénom et le nom des acteurs ayant joué dans au moins un film noté 9.0 ou plus.",
+              "hints": [
+                "Commencez par trouver les films avec note_moyenne >= 9.0.",
+                "Utilisez IN avec une sous-requête pour filtrer les rôles.",
+                "WHERE r.film_id IN (SELECT id FROM films WHERE note_moyenne >= 9.0)"
+              ],
+              "answer_query": "SELECT DISTINCT a.prenom, a.nom FROM acteurs a JOIN roles r ON r.acteur_id = a.id WHERE r.film_id IN (SELECT id FROM films WHERE note_moyenne >= 9.0)",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-14",
+              "title": "Films de l'acteur le plus présent",
+              "statement": "Affiche le titre des films dans lesquels joue l'acteur ayant le plus de rôles au total.",
+              "hints": [
+                "D'abord, trouvez l'acteur avec le plus de rôles : GROUP BY acteur_id + MAX via sous-requête.",
+                "Ensuite, trouvez ses films avec une deuxième sous-requête.",
+                "WHERE r.acteur_id = (SELECT acteur_id FROM roles GROUP BY acteur_id ORDER BY COUNT(*) DESC LIMIT 1)"
+              ],
+              "answer_query": "SELECT f.titre FROM films f JOIN roles r ON r.film_id = f.id WHERE r.acteur_id = (SELECT acteur_id FROM roles GROUP BY acteur_id ORDER BY COUNT(*) DESC LIMIT 1)",
+              "order_sensitive": false
+            },
+            {
+              "id": "cin-15",
+              "title": "Meilleur film par genre",
+              "statement": "Pour chaque genre, affiche le nom du genre, le titre et la note du film le mieux noté de ce genre.",
+              "hints": [
+                "Pour chaque genre, vous devez trouver le MAX de note_moyenne.",
+                "Une sous-requête corrélée peut comparer chaque film avec le max de son genre.",
+                "WHERE f.note_moyenne = (SELECT MAX(f2.note_moyenne) FROM films f2 WHERE f2.genre_id = f.genre_id)"
+              ],
+              "answer_query": "SELECT g.nom AS genre, f.titre, f.note_moyenne FROM films f JOIN genres g ON f.genre_id = g.id WHERE f.note_moyenne = (SELECT MAX(f2.note_moyenne) FROM films f2 WHERE f2.genre_id = f.genre_id) ORDER BY g.nom",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

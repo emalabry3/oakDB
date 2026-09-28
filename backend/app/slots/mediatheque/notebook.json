@@ -1,0 +1,189 @@
+{
+  "title": "Apprendre SQL avec la Médiathèque",
+  "description": "Explorez les livres, auteurs et emprunts d'une médiathèque municipale.",
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "Exploration simple",
+      "description": "Sélections, filtres et tris sur les tables de base.",
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Interroger les tables",
+          "exercises": [
+            {
+              "id": "med-01",
+              "title": "Liste des livres",
+              "statement": "Affiche le titre, l'année de publication et le stock de tous les livres, triés par titre.",
+              "hints": [
+                "Commencez par identifier la table contenant les livres.",
+                "Utilisez ORDER BY sur la colonne titre.",
+                "SELECT titre, annee_publication, stock FROM livres ORDER BY titre"
+              ],
+              "answer_query": "SELECT titre, annee_publication, stock FROM livres ORDER BY titre",
+              "order_sensitive": true
+            },
+            {
+              "id": "med-02",
+              "title": "Adhérents parisiens",
+              "statement": "Affiche le prénom, le nom et la ville des adhérents habitant à Paris.",
+              "hints": [
+                "Cherchez dans la table adherents.",
+                "Filtrez avec WHERE sur la colonne ville.",
+                "La valeur à comparer est la chaîne 'Paris'."
+              ],
+              "answer_query": "SELECT prenom, nom, ville FROM adherents WHERE ville = 'Paris'",
+              "order_sensitive": false
+            },
+            {
+              "id": "med-03",
+              "title": "Livres bien stockés",
+              "statement": "Affiche le titre et le stock des livres dont le stock est supérieur à 2, triés par stock décroissant.",
+              "hints": [
+                "Filtrez la table livres avec une condition numérique.",
+                "Utilisez WHERE stock > 2.",
+                "Triez ensuite avec ORDER BY stock DESC."
+              ],
+              "answer_query": "SELECT titre, stock FROM livres WHERE stock > 2 ORDER BY stock DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "med-04",
+              "title": "Nouveaux adhérents",
+              "statement": "Affiche le prénom, le nom et l'email des adhérents inscrits après le 1er janvier 2022.",
+              "hints": [
+                "Cherchez dans la table adherents.",
+                "Comparez la date d'inscription avec une chaîne de date au format 'YYYY-MM-DD'.",
+                "Utilisez WHERE date_inscription > '2022-01-01'."
+              ],
+              "answer_query": "SELECT prenom, nom, email FROM adherents WHERE date_inscription > '2022-01-01'",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "Jointures",
+      "description": "Combiner les données de plusieurs tables pour enrichir les résultats.",
+      "lessons": [
+        {
+          "id": "l2",
+          "title": "Relier les tables",
+          "exercises": [
+            {
+              "id": "med-05",
+              "title": "Livres et leurs auteurs",
+              "statement": "Affiche le titre de chaque livre ainsi que le prénom et le nom de son auteur.",
+              "hints": [
+                "Deux tables sont nécessaires : livres et auteurs.",
+                "Utilisez JOIN avec la colonne auteur_id.",
+                "SELECT l.titre, a.prenom, a.nom FROM livres l JOIN auteurs a ON l.auteur_id = a.id"
+              ],
+              "answer_query": "SELECT l.titre, a.prenom, a.nom FROM livres l JOIN auteurs a ON l.auteur_id = a.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "med-06",
+              "title": "Livres et leurs genres",
+              "statement": "Affiche le titre des livres et le nom de leur genre.",
+              "hints": [
+                "Joignez les tables livres et genres.",
+                "Le lien entre les deux tables est la colonne genre_id.",
+                "Utilisez un alias pour la colonne nom du genre : AS genre."
+              ],
+              "answer_query": "SELECT l.titre, g.nom AS genre FROM livres l JOIN genres g ON l.genre_id = g.id",
+              "order_sensitive": false
+            },
+            {
+              "id": "med-07",
+              "title": "Emprunts en cours",
+              "statement": "Affiche le prénom et le nom de l'adhérent, le titre du livre et la date d'emprunt pour les emprunts en cours (non encore retournés).",
+              "hints": [
+                "Trois tables sont nécessaires : emprunts, adherents et livres.",
+                "Un emprunt est en cours quand date_retour_reelle est NULL.",
+                "Utilisez WHERE e.date_retour_reelle IS NULL après vos jointures."
+              ],
+              "answer_query": "SELECT ad.prenom, ad.nom, l.titre, e.date_emprunt FROM emprunts e JOIN adherents ad ON e.adherent_id = ad.id JOIN livres l ON e.livre_id = l.id WHERE e.date_retour_reelle IS NULL",
+              "order_sensitive": false
+            },
+            {
+              "id": "med-08",
+              "title": "Romans et leurs auteurs",
+              "statement": "Affiche le titre du livre, le prénom et le nom de l'auteur uniquement pour les livres de genre 'Roman'.",
+              "hints": [
+                "Vous avez besoin de trois tables : livres, auteurs et genres.",
+                "Commencez par joindre livres avec auteurs, puis avec genres.",
+                "Filtrez ensuite avec WHERE g.nom = 'Roman'."
+              ],
+              "answer_query": "SELECT l.titre, a.prenom, a.nom FROM livres l JOIN auteurs a ON l.auteur_id = a.id JOIN genres g ON l.genre_id = g.id WHERE g.nom = 'Roman'",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "Agrégations",
+      "description": "Compter, regrouper et filtrer des groupes de données.",
+      "lessons": [
+        {
+          "id": "l3",
+          "title": "GROUP BY et HAVING",
+          "exercises": [
+            {
+              "id": "med-09",
+              "title": "Livres par genre",
+              "statement": "Affiche le nom de chaque genre et le nombre de livres qu'il contient, trié par nombre de livres décroissant.",
+              "hints": [
+                "Joignez genres et livres, puis regroupez par nom de genre.",
+                "Utilisez COUNT(l.id) pour compter les livres.",
+                "Triez avec ORDER BY nb_livres DESC."
+              ],
+              "answer_query": "SELECT g.nom, COUNT(l.id) AS nb_livres FROM genres g JOIN livres l ON l.genre_id = g.id GROUP BY g.nom ORDER BY nb_livres DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "med-10",
+              "title": "Auteurs prolifiques",
+              "statement": "Affiche le prénom, le nom de chaque auteur et le nombre de livres qu'il a écrits, pour les auteurs ayant écrit au moins 2 livres.",
+              "hints": [
+                "Joignez auteurs et livres, puis regroupez par auteur.",
+                "Utilisez HAVING pour filtrer les groupes après COUNT.",
+                "HAVING COUNT(l.id) >= 2 filtre les auteurs avec au moins 2 livres."
+              ],
+              "answer_query": "SELECT a.prenom, a.nom, COUNT(l.id) AS nb_livres FROM auteurs a JOIN livres l ON l.auteur_id = a.id GROUP BY a.prenom, a.nom HAVING COUNT(l.id) >= 2",
+              "order_sensitive": false
+            },
+            {
+              "id": "med-11",
+              "title": "Adhérents les plus actifs",
+              "statement": "Affiche le prénom et le nom de chaque adhérent avec le nombre total d'emprunts qu'il a effectués, trié par nombre d'emprunts décroissant.",
+              "hints": [
+                "Joignez adherents et emprunts, puis regroupez par adhérent.",
+                "Comptez les emprunts avec COUNT(e.id).",
+                "Triez le résultat avec ORDER BY nb_emprunts DESC."
+              ],
+              "answer_query": "SELECT ad.prenom, ad.nom, COUNT(e.id) AS nb_emprunts FROM adherents ad JOIN emprunts e ON e.adherent_id = ad.id GROUP BY ad.prenom, ad.nom ORDER BY nb_emprunts DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "med-12",
+              "title": "Livres très empruntés",
+              "statement": "Affiche le titre des livres qui ont été empruntés plus d'une fois, avec leur nombre d'emprunts, trié par nombre d'emprunts décroissant.",
+              "hints": [
+                "Joignez livres et emprunts, puis regroupez par titre de livre.",
+                "Utilisez HAVING pour ne garder que les livres empruntés plus d'une fois.",
+                "HAVING COUNT(e.id) > 1 puis ORDER BY nb_emprunts DESC."
+              ],
+              "answer_query": "SELECT l.titre, COUNT(e.id) AS nb_emprunts FROM livres l JOIN emprunts e ON e.livre_id = l.id GROUP BY l.titre HAVING COUNT(e.id) > 1 ORDER BY nb_emprunts DESC",
+              "order_sensitive": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

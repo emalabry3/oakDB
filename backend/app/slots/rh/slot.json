@@ -1,0 +1,9 @@
+{
+  "id": "rh-v1",
+  "name": "Ressources Humaines",
+  "description": "Gérez les employés, services et salaires d'une entreprise.",
+  "difficulty": "intermediaire",
+  "version": "1.0",
+  "author": "oakDB",
+  "tags": ["jointures", "agrégations", "salaires", "GROUP BY"]
+}

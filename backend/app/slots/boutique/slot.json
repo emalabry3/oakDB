@@ -1,0 +1,9 @@
+{
+  "id": "boutique-v1",
+  "name": "La Boutique en ligne",
+  "description": "Une base e-commerce : clients, commandes, produits, catégories.",
+  "difficulty": "debutant",
+  "version": "1.0",
+  "author": "oakDB",
+  "tags": ["SELECT", "WHERE", "JOIN", "GROUP BY", "HAVING"]
+}
