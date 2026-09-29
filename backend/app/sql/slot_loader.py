@@ -55,6 +55,28 @@ class SlotDatabase:
         tables_result = self.conn.execute(
             "SELECT table_name FROM information_schema.tables WHERE table_schema = 'main' ORDER BY table_name"
         ).fetchall()
+
+        # Récupère FK et PK en une seule requête
+        try:
+            constraint_rows = self.conn.execute("""
+                SELECT table_name, constraint_type,
+                       constraint_column_names[1] AS col,
+                       referenced_table,
+                       referenced_column_names[1] AS ref_col
+                FROM duckdb_constraints()
+                WHERE constraint_type IN ('FOREIGN KEY', 'PRIMARY KEY')
+            """).fetchall()
+        except Exception:
+            constraint_rows = []
+
+        fk_map: dict[str, dict[str, dict]] = {}
+        pk_map: dict[str, set] = {}
+        for table_name, ctype, col, ref_table, ref_col in constraint_rows:
+            if ctype == 'FOREIGN KEY':
+                fk_map.setdefault(table_name, {})[col] = {"table": ref_table, "column": ref_col}
+            elif ctype == 'PRIMARY KEY':
+                pk_map.setdefault(table_name, set()).add(col)
+
         schema = []
         for (table_name,) in tables_result:
             cols_result = self.conn.execute(
@@ -62,10 +84,17 @@ class SlotDatabase:
                 "WHERE table_schema = 'main' AND table_name = ? ORDER BY ordinal_position",
                 [table_name]
             ).fetchall()
-            schema.append({
-                "table": table_name,
-                "columns": [{"name": col, "type": dtype} for col, dtype in cols_result]
-            })
+            table_fks = fk_map.get(table_name, {})
+            table_pks = pk_map.get(table_name, set())
+            columns = []
+            for col, dtype in cols_result:
+                col_info: dict = {"name": col, "type": dtype}
+                if col in table_pks:
+                    col_info["is_primary_key"] = True
+                if col in table_fks:
+                    col_info["references"] = table_fks[col]
+                columns.append(col_info)
+            schema.append({"table": table_name, "columns": columns})
         return schema
 
     def _format_error(self, e: Exception) -> str:

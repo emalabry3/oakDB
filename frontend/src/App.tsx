@@ -6,6 +6,7 @@ import type { editor } from 'monaco-editor'
 import { SqlEditor } from './components/SqlEditor'
 import { ResultTable } from './components/ResultTable'
 import { SchemaPanel } from './components/SchemaPanel'
+import { DataModelModal } from './components/DataModelModal'
 import { StepVisualizer } from './components/StepVisualizer'
 import { executeQuery, getSchema, getSteps, listSlots } from './api/client'
 import type { QueryResult, QueryStep, SlotInfo } from './api/client'
@@ -30,6 +31,7 @@ function EditorLayout() {
   const [result, setResult] = useState<QueryResult | null>(null)
   const [queryError, setQueryError] = useState<string | null>(null)
   const [activeSlotId, setActiveSlotId] = useState('')
+  const [showDataModel, setShowDataModel] = useState(false)
 
   // Visualisation
   const [vizSteps, setVizSteps] = useState<QueryStep[] | null>(null)
@@ -167,6 +169,13 @@ function EditorLayout() {
             </select>
           )}
           <button
+            onClick={() => setShowDataModel(true)}
+            className="px-3 py-1 bg-teal-700 hover:bg-teal-600 text-white text-sm rounded"
+            title="Afficher le modèle de données"
+          >
+            Modèle
+          </button>
+          <button
             onClick={() => navigate(`/notebook/${activeSlotId}`)}
             className="px-3 py-1 bg-indigo-700 hover:bg-indigo-600 text-white text-sm rounded"
           >
@@ -255,6 +264,10 @@ function EditorLayout() {
           )}
         </div>
       </main>
+
+      {showDataModel && (
+        <DataModelModal tables={schema} onClose={() => setShowDataModel(false)} />
+      )}
     </div>
   )
 }

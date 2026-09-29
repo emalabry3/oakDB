@@ -5,9 +5,16 @@ export interface QueryResult {
   rows: unknown[][]
 }
 
+export interface SchemaColumn {
+  name: string
+  type: string
+  is_primary_key?: boolean
+  references?: { table: string; column: string }
+}
+
 export interface SchemaTable {
   table: string
-  columns: { name: string; type: string }[]
+  columns: SchemaColumn[]
 }
 
 export interface SlotInfo {
