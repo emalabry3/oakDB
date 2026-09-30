@@ -30,7 +30,9 @@ function EditorLayout() {
   const [sql, setSql] = useState('SELECT * FROM clients')
   const [result, setResult] = useState<QueryResult | null>(null)
   const [queryError, setQueryError] = useState<string | null>(null)
-  const [activeSlotId, setActiveSlotId] = useState('')
+  const [activeSlotId, setActiveSlotId] = useState(
+    () => localStorage.getItem('oakdb-active-slot') || ''
+  )
   const [showDataModel, setShowDataModel] = useState(false)
 
   // Visualisation
@@ -52,10 +54,11 @@ function EditorLayout() {
     queryFn: listSlots,
   })
 
-  // Initialise le slot actif au premier chargement
+  // Initialise le slot actif au premier chargement (si rien n'est sauvegardé)
   useEffect(() => {
     if (slots.length > 0 && activeSlotId === '') {
       setActiveSlotId(slots[0].id)
+      localStorage.setItem('oakdb-active-slot', slots[0].id)
     }
   }, [slots, activeSlotId])
 
@@ -160,7 +163,7 @@ function EditorLayout() {
           {slots.length > 1 && (
             <select
               value={activeSlotId}
-              onChange={(e) => setActiveSlotId(e.target.value)}
+              onChange={(e) => { setActiveSlotId(e.target.value); localStorage.setItem('oakdb-active-slot', e.target.value) }}
               className="bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded px-2 py-1"
             >
               {slots.map(s => (
@@ -213,6 +216,7 @@ function EditorLayout() {
             onChange={(v) => { setSql(v); clearHighlight() }}
             onExecute={handleExecute}
             onMount={handleEditorMount}
+            schema={schema}
           />
           <div className="px-4 py-2 flex items-center gap-3 bg-gray-800">
             <button

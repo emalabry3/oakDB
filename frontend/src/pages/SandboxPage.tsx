@@ -143,6 +143,7 @@ export function SandboxPage() {
             value={sql}
             onChange={(v) => setSql(v)}
             onExecute={handleExecute}
+            schema={schema}
           />
           <div className="px-4 py-2 flex items-center gap-3 bg-gray-800">
             <button

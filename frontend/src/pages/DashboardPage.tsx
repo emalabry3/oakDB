@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { listSessions, createSession, listSlots } from '../api/client'
@@ -24,8 +24,15 @@ export function DashboardPage() {
     queryFn: () => listSlots(),
   })
 
+  // Initialise slotId avec le premier slot quand la liste charge
+  useEffect(() => {
+    if (slots.length > 0 && !slotId) {
+      setSlotId(slots[0].id)
+    }
+  }, [slots, slotId])
+
   const createMutation = useMutation({
-    mutationFn: () => createSession(nom, slotId || slots[0]?.id, token),
+    mutationFn: () => createSession(nom, slotId, token),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['sessions'] })
       setNom('')
@@ -67,7 +74,7 @@ export function DashboardPage() {
             </select>
             <button
               type="submit"
-              disabled={createMutation.isPending || !nom.trim()}
+              disabled={createMutation.isPending || !nom.trim() || !slotId}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm rounded font-medium"
             >
               Créer

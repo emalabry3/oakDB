@@ -173,6 +173,7 @@ export function ExercisePage() {
                 onChange={setSql}
                 onExecute={() => validateMutation.mutate()}
                 onMount={(ed, monaco) => { editorRef.current = ed; monacoRef.current = monaco }}
+                schema={schema}
               />
               <div className="px-4 py-2 flex items-center gap-3 bg-gray-800">
                 <button
