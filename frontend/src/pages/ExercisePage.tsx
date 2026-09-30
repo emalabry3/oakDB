@@ -4,11 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 import type { Monaco } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import { getNotebook, getSchema, validateExercise, getSteps } from '../api/client'
-import type { Exercise } from '../api/client'
+import { getNotebook, getSchema, validateExercise, getSteps, executeQuery } from '../api/client'
+import type { Exercise, QueryResult } from '../api/client'
 import { SqlEditor } from '../components/SqlEditor'
 import { SchemaPanel } from '../components/SchemaPanel'
 import { StepVisualizer } from '../components/StepVisualizer'
+import { ResultTable } from '../components/ResultTable'
 import type { QueryStep } from '../api/client'
 import { useAuthStore } from '../store/authStore'
 
@@ -20,6 +21,7 @@ export function ExercisePage() {
 
   const [sql, setSql] = useState('')
   const [feedback, setFeedback] = useState<{ success: boolean; message: string } | null>(null)
+  const [queryResult, setQueryResult] = useState<QueryResult | null>(null)
   const [hintsRevealed, setHintsRevealed] = useState(0)
   const [vizSteps, setVizSteps] = useState<QueryStep[] | null>(null)
   const [vizIndex, setVizIndex] = useState(0)
@@ -50,12 +52,17 @@ export function ExercisePage() {
   const prevEx = currentIdx > 0 ? allExercises[currentIdx - 1] : null
   const nextEx = currentIdx < allExercises.length - 1 ? allExercises[currentIdx + 1] : null
 
-  // Validation
+  // Validation + exécution séquentielles (même connexion DuckDB partagée)
   const validateMutation = useMutation({
-    mutationFn: () => validateExercise(slotId, exerciseId, sql, hintsRevealed > 0, user?.token),
-    onSuccess: (data) => {
-      setFeedback({ success: data.success, message: data.feedback })
-      if (data.success) {
+    mutationFn: async () => {
+      const validation = await validateExercise(slotId, exerciseId, sql, hintsRevealed > 0, user?.token)
+      const result = await executeQuery(sql, slotId).catch(() => null)
+      return { validation, result }
+    },
+    onSuccess: ({ validation, result }) => {
+      setFeedback({ success: validation.success, message: validation.feedback })
+      setQueryResult(result)
+      if (validation.success) {
         queryClient.invalidateQueries({ queryKey: ['progress', slotId] })
       }
     },
@@ -118,11 +125,11 @@ export function ExercisePage() {
           <span className="text-sm text-gray-300 font-medium">{exercise.title}</span>
           <div className="ml-auto flex gap-2">
             {prevEx && (
-              <button onClick={() => { navigate(`/notebook/${slotId}/exercise/${prevEx.id}`); setFeedback(null); setHintsRevealed(0); setSql(''); setVizSteps(null) }}
+              <button onClick={() => { navigate(`/notebook/${slotId}/exercise/${prevEx.id}`); setFeedback(null); setQueryResult(null); setHintsRevealed(0); setSql(''); setVizSteps(null) }}
                 className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-sm rounded">← Précédent</button>
             )}
             {nextEx && (
-              <button onClick={() => { navigate(`/notebook/${slotId}/exercise/${nextEx.id}`); setFeedback(null); setHintsRevealed(0); setSql(''); setVizSteps(null) }}
+              <button onClick={() => { navigate(`/notebook/${slotId}/exercise/${nextEx.id}`); setFeedback(null); setQueryResult(null); setHintsRevealed(0); setSql(''); setVizSteps(null) }}
                 className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-sm rounded">Suivant →</button>
             )}
           </div>
@@ -198,6 +205,13 @@ export function ExercisePage() {
               </div>
             )}
 
+            {/* Résultat de la requête */}
+            {queryResult && !vizSteps && (
+              <div className="flex-shrink-0 border-b border-gray-700 overflow-x-auto px-4 py-3 max-h-64 overflow-y-auto">
+                <ResultTable columns={queryResult.columns} rows={queryResult.rows} />
+              </div>
+            )}
+
             {/* Visualisation */}
             <div className="flex-1 overflow-auto p-4">
               {vizSteps ? (
@@ -207,9 +221,11 @@ export function ExercisePage() {
                   onNavigate={handleNavigate}
                 />
               ) : (
-                <p className="text-gray-600 text-sm text-center mt-8">
-                  Écrivez votre requête SQL et cliquez sur Vérifier.
-                </p>
+                !queryResult && (
+                  <p className="text-gray-600 text-sm text-center mt-8">
+                    Écrivez votre requête SQL et cliquez sur Vérifier.
+                  </p>
+                )
               )}
             </div>
           </div>

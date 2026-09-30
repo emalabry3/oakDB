@@ -21,8 +21,10 @@ err()  { echo -e "${RED}[oakDB]${NC} $1"; }
 cleanup() {
   echo ""
   log "Arrêt en cours..."
+  # $BACKEND_PID/$FRONTEND_PID pointent sur sed (dernier du pipe), pas uvicorn/npm
   kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
-  wait "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
+  pkill -f "uvicorn app.main:app" 2>/dev/null || true
+  pkill -f "vite"                  2>/dev/null || true
   ok "Arrêté."
   exit 0
 }

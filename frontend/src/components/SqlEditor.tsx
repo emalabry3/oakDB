@@ -1,4 +1,5 @@
 import Editor, { type Monaco } from '@monaco-editor/react'
+import { useRef, useEffect } from 'react'
 import type { editor } from 'monaco-editor'
 
 interface Props {
@@ -9,6 +10,9 @@ interface Props {
 }
 
 export function SqlEditor({ value, onChange, onExecute, onMount }: Props) {
+  const onExecuteRef = useRef(onExecute)
+  useEffect(() => { onExecuteRef.current = onExecute }, [onExecute])
+
   return (
     <Editor
       height="200px"
@@ -19,7 +23,7 @@ export function SqlEditor({ value, onChange, onExecute, onMount }: Props) {
       onMount={(editor, monaco) => {
         editor.addCommand(
           monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-          onExecute
+          () => onExecuteRef.current()
         )
         onMount?.(editor, monaco)
       }}
