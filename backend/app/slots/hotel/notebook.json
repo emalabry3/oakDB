@@ -1,0 +1,317 @@
+{
+  "title": "SQL avec la Base Hôtelière",
+  "description": "Du SELECT simple aux sous-requêtes avancées, sur une base hôtelière internationale.",
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "SELECT de base",
+      "description": "Premières requêtes sur les tables clients et produits.",
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Sélections simples",
+          "exercises": [
+            {
+              "id": "ex1",
+              "title": "Noms et prénoms des clients",
+              "statement": "Liste des noms et prénoms des clients.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT FROM CLIENT",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex2",
+              "title": "Numéros de clients ayant réservé",
+              "statement": "Liste des numéros de clients ayant réservé une chambre.",
+              "hints": [],
+              "answer_query": "SELECT DISTINCT CLIENT_ID FROM RESERVATION",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex3",
+              "title": "Prix HT, TVA et TTC des produits",
+              "statement": "Liste des noms de produits, prix HT, TVA (19.6%) et TTC.",
+              "hints": [],
+              "answer_query": "SELECT NOM_PRODUIT, PRIX_BASE_PRODUIT AS prix_ht, ROUND(PRIX_BASE_PRODUIT * 0.196, 2) AS tva, ROUND(PRIX_BASE_PRODUIT * 1.196, 2) AS ttc FROM PRODUIT",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "title": "Filtres et tri",
+      "description": "WHERE, LIKE, BETWEEN, IS NULL, ORDER BY.",
+      "lessons": [
+        {
+          "id": "l2",
+          "title": "Conditions et tri",
+          "exercises": [
+            {
+              "id": "ex4",
+              "title": "Clients sans opérateur",
+              "statement": "Liste des clients non suivis par un opérateur.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT FROM CLIENT WHERE OPERATEUR_ID IS NULL",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex5",
+              "title": "Clients de plus de 30 ans par ordre décroissant",
+              "statement": "Nom du client dont l'âge est supérieur à 30 ans, trié par ordre décroissant.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE AGE > 30 ORDER BY AGE DESC",
+              "order_sensitive": true
+            },
+            {
+              "id": "ex6",
+              "title": "Clients dont le nom commence par M",
+              "statement": "Liste des noms et prénoms des clients dont le nom commence par la lettre 'M'.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT FROM CLIENT WHERE NOM_CLIENT LIKE 'M%'",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex7",
+              "title": "Clients entre 40 et 50 ans",
+              "statement": "Liste des noms et prénoms des clients ayant entre 40 et 50 ans.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT FROM CLIENT WHERE AGE BETWEEN 40 AND 50",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex8",
+              "title": "Clients sans parrain de moins de 20 ans ou plus de 50 ans",
+              "statement": "Liste des clients sans parrain ayant moins de 20 ans ou plus de 50 ans.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT FROM CLIENT WHERE PARRAIN_ID IS NULL AND (AGE < 20 OR AGE > 50)",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex9",
+              "title": "Clients classés par ville puis par nom",
+              "statement": "Liste des clients, classée par numéro de ville et par nom de client.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT, PRENOM_CLIENT, VILLE_ID FROM CLIENT ORDER BY VILLE_ID, NOM_CLIENT",
+              "order_sensitive": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "title": "Jointures",
+      "description": "INNER JOIN, LEFT JOIN et auto-jointures.",
+      "lessons": [
+        {
+          "id": "l3",
+          "title": "Jointures internes",
+          "exercises": [
+            {
+              "id": "ex10",
+              "title": "Hôtels avec leur ville",
+              "statement": "Liste des hôtels accompagnée du nom des villes.",
+              "hints": [],
+              "answer_query": "SELECT H.NOM_HOTEL, V.NOM_VILLE FROM HOTEL H JOIN VILLE V ON H.VILLE_ID = V.VILLE_ID",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex11",
+              "title": "Clients résidant en France",
+              "statement": "Liste des clients qui résident en France.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, C.PRENOM_CLIENT FROM CLIENT C JOIN VILLE V ON C.VILLE_ID = V.VILLE_ID JOIN REGION R ON V.REGION_ID = R.REGION_ID JOIN PAYS P ON R.PAYS_ID = P.PAYS_ID WHERE P.NOM_PAYS = 'France'",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex12",
+              "title": "Clients de plus de 60 ans ayant réservé",
+              "statement": "Liste des clients de plus de 60 ans ayant effectué au moins une réservation.",
+              "hints": [],
+              "answer_query": "SELECT DISTINCT C.NOM_CLIENT, C.PRENOM_CLIENT FROM CLIENT C JOIN RESERVATION R ON C.CLIENT_ID = R.CLIENT_ID WHERE C.AGE > 60",
+              "order_sensitive": false
+            }
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "LEFT JOIN et auto-jointures",
+          "exercises": [
+            {
+              "id": "ex13",
+              "title": "Opérateurs et leurs clients habituels",
+              "statement": "Liste des opérateurs (tous) et de leurs clients habituels.",
+              "hints": [],
+              "answer_query": "SELECT O.NOM_OPERATEUR, C.NOM_CLIENT FROM OPERATEUR O LEFT JOIN CLIENT C ON O.OPERATEUR_ID = C.OPERATEUR_ID",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex14",
+              "title": "Opérateurs sans clients",
+              "statement": "Liste des opérateurs n'ayant pas de clients habituels.",
+              "hints": [],
+              "answer_query": "SELECT O.NOM_OPERATEUR FROM OPERATEUR O LEFT JOIN CLIENT C ON O.OPERATEUR_ID = C.OPERATEUR_ID WHERE C.CLIENT_ID IS NULL",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex15",
+              "title": "Clients n'ayant jamais réservé",
+              "statement": "Liste des clients n'ayant jamais réservé.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, C.PRENOM_CLIENT FROM CLIENT C LEFT JOIN RESERVATION R ON C.CLIENT_ID = R.CLIENT_ID WHERE R.RESERVATION_ID IS NULL",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex16",
+              "title": "Clients et leur parrain",
+              "statement": "Liste des noms des clients et de leur parrain.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, P.NOM_CLIENT AS parrain FROM CLIENT C LEFT JOIN CLIENT P ON C.PARRAIN_ID = P.CLIENT_ID",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex17",
+              "title": "Opérateurs et leur supérieur hiérarchique",
+              "statement": "Liste des noms des opérateurs et de leur supérieur hiérarchique immédiat.",
+              "hints": [],
+              "answer_query": "SELECT O.NOM_OPERATEUR, S.NOM_OPERATEUR AS superieur FROM OPERATEUR O LEFT JOIN OPERATEUR S ON O.CHEF_ID = S.OPERATEUR_ID",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex18",
+              "title": "Clients avec tranche d'âge",
+              "statement": "Liste des clients avec leur âge et leur tranche d'âge.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, C.AGE, T.TRANCHE_AGE FROM CLIENT C JOIN TRANCHE_AGE T ON C.AGE BETWEEN T.AGE_MIN AND T.AGE_MAX",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch4",
+      "title": "Agrégations",
+      "description": "GROUP BY, HAVING, SUM, COUNT, AVG.",
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "Groupements et totaux",
+          "exercises": [
+            {
+              "id": "ex19",
+              "title": "Total de jours réservés par client",
+              "statement": "Nombre total de jours réservés par client.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, SUM(R.NBNUITS_RESERVATION) AS total_jours FROM CLIENT C JOIN RESERVATION R ON C.CLIENT_ID = R.CLIENT_ID GROUP BY C.CLIENT_ID, C.NOM_CLIENT",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex20",
+              "title": "Clients ayant réservé plus de 17 jours",
+              "statement": "Clients ayant réservé plus de 17 jours au total.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT, SUM(R.NBNUITS_RESERVATION) AS total_jours FROM CLIENT C JOIN RESERVATION R ON C.CLIENT_ID = R.CLIENT_ID GROUP BY C.CLIENT_ID, C.NOM_CLIENT HAVING SUM(R.NBNUITS_RESERVATION) > 17",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch5",
+      "title": "Sous-requêtes",
+      "description": "Requêtes imbriquées, IN, NOT IN, ALL, ANY.",
+      "lessons": [
+        {
+          "id": "l6",
+          "title": "Sous-requêtes scalaires et ensemblistes",
+          "exercises": [
+            {
+              "id": "ex21",
+              "title": "Clients fidèles (1998 et 1999)",
+              "statement": "Liste des noms des clients ayant réservé en 1998 et en 1999.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE CLIENT_ID IN (SELECT CLIENT_ID FROM RESERVATION WHERE YEAR(DATE_DEB_RESERVATION) = 1998) AND CLIENT_ID IN (SELECT CLIENT_ID FROM RESERVATION WHERE YEAR(DATE_DEB_RESERVATION) = 1999)",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex22",
+              "title": "Clients perdus (1998 mais pas 1999)",
+              "statement": "Liste des noms des clients ayant réservé en 1998 mais pas en 1999.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE CLIENT_ID IN (SELECT CLIENT_ID FROM RESERVATION WHERE YEAR(DATE_DEB_RESERVATION) = 1998) AND CLIENT_ID NOT IN (SELECT CLIENT_ID FROM RESERVATION WHERE YEAR(DATE_DEB_RESERVATION) = 1999)",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex23",
+              "title": "Clients ayant réservé en 1998 ou 1999",
+              "statement": "Liste des noms des clients ayant réservé en 1998 ou 1999.",
+              "hints": [],
+              "answer_query": "SELECT DISTINCT NOM_CLIENT FROM CLIENT WHERE CLIENT_ID IN (SELECT CLIENT_ID FROM RESERVATION WHERE YEAR(DATE_DEB_RESERVATION) IN (1998, 1999))",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex24",
+              "title": "Clients plus âgés que la moyenne",
+              "statement": "Liste des noms des clients dont l'âge est supérieur à la moyenne.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE AGE > (SELECT AVG(AGE) FROM CLIENT)",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex25",
+              "title": "Clients du même âge que Oneda",
+              "statement": "Nom des clients ayant le même âge que le client 'Oneda'.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE AGE = (SELECT AGE FROM CLIENT WHERE NOM_CLIENT = 'Oneda')",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex26",
+              "title": "Clients suivis par le même opérateur que Makino",
+              "statement": "Liste des clients suivis par le même opérateur que Makino.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE OPERATEUR_ID = (SELECT OPERATEUR_ID FROM CLIENT WHERE NOM_CLIENT = 'Makino') AND NOM_CLIENT != 'Makino'",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex27",
+              "title": "Clients ayant réservé plus que la moyenne",
+              "statement": "Clients ayant réservé plus de jours que la moyenne de tous les clients.",
+              "hints": [],
+              "answer_query": "SELECT C.NOM_CLIENT FROM CLIENT C JOIN RESERVATION R ON C.CLIENT_ID = R.CLIENT_ID GROUP BY C.CLIENT_ID, C.NOM_CLIENT HAVING SUM(R.NBNUITS_RESERVATION) > (SELECT AVG(total) FROM (SELECT SUM(NBNUITS_RESERVATION) AS total FROM RESERVATION GROUP BY CLIENT_ID) AS sub)",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex28",
+              "title": "Opérateurs avec au moins un client de moins de 25 ans",
+              "statement": "Liste des opérateurs qui suivent au moins un client de moins de 25 ans.",
+              "hints": [],
+              "answer_query": "SELECT DISTINCT O.NOM_OPERATEUR FROM OPERATEUR O JOIN CLIENT C ON O.OPERATEUR_ID = C.OPERATEUR_ID WHERE C.AGE < 25",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex29",
+              "title": "Clients plus âgés que n'importe quel Américain",
+              "statement": "Liste des clients plus âgés que n'importe quel Américain.",
+              "hints": [],
+              "answer_query": "SELECT NOM_CLIENT FROM CLIENT WHERE AGE > ALL (SELECT C.AGE FROM CLIENT C JOIN VILLE V ON C.VILLE_ID = V.VILLE_ID JOIN REGION R ON V.REGION_ID = R.REGION_ID JOIN PAYS P ON R.PAYS_ID = P.PAYS_ID WHERE P.NOM_PAYS = 'Etats-Unis')",
+              "order_sensitive": false
+            },
+            {
+              "id": "ex30",
+              "title": "Clients de 1998 ayant séjourné à Chez Robert en 2001",
+              "statement": "Liste des clients ayant réservé en 1998 et ayant pris une chambre en 2001 dans l'hôtel 'Chez Robert' (id=5).",
+              "hints": [],
+              "answer_query": "SELECT DISTINCT C.NOM_CLIENT FROM CLIENT C JOIN RESERVATION R98 ON C.CLIENT_ID = R98.CLIENT_ID AND YEAR(R98.DATE_DEB_RESERVATION) = 1998 JOIN RESERVATION R01 ON C.CLIENT_ID = R01.CLIENT_ID AND YEAR(R01.DATE_DEB_RESERVATION) = 2001 AND R01.HOTEL_ID = 5",
+              "order_sensitive": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "hotel-v1",
+  "name": "La Base Hôtelière",
+  "description": "Une base hôtelière internationale : clients, hôtels, réservations, factures, opérateurs.",
+  "difficulty": "intermediaire",
+  "version": "1.0",
+  "author": "Emmanuel Malabry",
+  "tags": ["SELECT", "WHERE", "JOIN", "LEFT JOIN", "GROUP BY", "HAVING", "sous-requêtes", "auto-jointure"]
+}
